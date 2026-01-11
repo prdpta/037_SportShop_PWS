@@ -1,0 +1,60 @@
+@startuml
+' Mengatur tata letak agar mengalir dari atas ke bawah
+top to bottom direction
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype ortho
+
+' Pengelompokan Komponen Berdasarkan Layer
+package "Client Side (Frontend)" as Client {
+    [Web Browser Interface] as frontend
+    [Search UI (Amazon Simulator)] as explorer
+}
+
+package "Server Side (Backend)" as Server {
+    [Node.js Express Server] as express
+    
+    package "Middlewares" {
+        [Auth Middleware] as auth
+        [API Key Validator] as validator
+    }
+    
+    package "Business Logic" {
+        [Key Generator Engine] as keygen
+        [Product Search Logic] as search
+    }
+}
+
+database "Data Storage" as DB {
+    [MySQL Database] as mysql
+}
+
+' 1. ALUR AUTENTIKASI (Warna Hitam)
+frontend --> express : 1. Login/Register Request
+express --> auth : 2. Verify Session
+auth --> mysql : 3. Check Credentials
+
+' 2. ALUR MANAJEMEN API KEY (Warna Biru)
+frontend -[#blue]-> express : 4. Request Generate Key
+express -[#blue]-> keygen : 5. Trigger Generation
+keygen -[#blue]-> mysql : 6. Update user_keys (set is_active=0)\n   & Insert New Key (SPORT-XXXX)
+
+' 3. ALUR PENCARIAN PRODUK (Warna Hijau)
+explorer -[#green]-> express : 7. GET /api/products (Input Key)
+express -[#green]-> validator : 8. Validate x-api-key
+validator -[#green]-> mysql : 9. Check if Key exists & active
+validator -[#green]-> search : 10. If Key Valid
+search -[#green]-> explorer : 11. Return Product Data (JSON)
+
+' Catatan tambahan untuk kejelasan
+note right of keygen
+  Prefix: SPORT-
+  Method: crypto.randomBytes
+end note
+
+note left of auth
+  Session Based
+  (express-session)
+end note
+
+@endum
