@@ -1,0 +1,33 @@
+@startuml
+' Konfigurasi tampilan ERD Professional
+skinparam linetype ortho
+skinparam shadowing false
+skinparam class {
+    BackgroundColor White
+    ArrowColor Black
+    BorderColor Black
+}
+
+entity "users" {
+  * id : INT <<PK>>
+  --
+  * username : VARCHAR(50)
+  * email : VARCHAR(100)
+  * password_hash : VARCHAR(255)
+  * role : ENUM('admin', 'user')
+  * created_at : TIMESTAMP
+}
+
+entity "user_keys" {
+  * id : INT <<PK>>
+  --
+  * user_id : INT <<FK>>
+  * key_value : VARCHAR(255)
+  * hits : INT
+  * is_active : TINYINT(1)
+  * created_at : TIMESTAMP
+}
+
+' Relasi: Satu User bisa memiliki banyak history API Keys
+users ||--o{ user_keys : "has many"
+@endum
