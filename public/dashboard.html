@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard | SportShop</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="nav">
+        <h1>SportShop Dashboard</h1>
+        <a href="/auth/logout" class="btn-logout" style="color:red; text-decoration:none; font-weight:bold;">Keluar</a>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <h3>API Key Management</h3>
+            <button onclick="generateKey()" style="width:auto; padding:10px 20px; background:#4f46e5; color:white; border:none; border-radius:5px; cursor:pointer;">Generate Key</button>
+            <p>Key Anda: <strong id="displayKey" style="color:blue;">-</strong></p>
+        </div>
+
+        <div class="card">
+            <h3>Cari Produk Amazon</h3>
+            <div style="display:flex; gap:10px;">
+                <input type="text" id="inputKey" placeholder="Masukkan API Key">
+                <input type="text" id="inputQuery" placeholder="Cari barang (contoh: raket)">
+                <button onclick="cariBarang()" style="background:#10b981; color:white; border:none; padding:10px 20px; border-radius:5px; cursor:pointer;">CARI</button>
+            </div>
+        </div>
+
+        <div id="hasilPencarian" class="grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:20px; margin-top:20px;"></div>
+    </div>
+
+    <script>
+        async function generateKey() {
+            const res = await fetch('/api/generate-key', { method: 'POST' });
+            const data = await res.json();
+            document.getElementById('displayKey').innerText = data.key;
+            document.getElementById('inputKey').value = data.key;
+        }
+
+        async function cariBarang() {
+            const key = document.getElementById('inputKey').value;
+            const query = document.getElementById('inputQuery').value;
+            const container = document.getElementById('hasilPencarian');
+
+            if(!key || !query) return alert("Isi data!");
+            container.innerHTML = "Mencari...";
+
+            try {
+                const res = await fetch(`/api/search?api_key=${key}&query=${query}`);
+                const products = await res.json();
+                container.innerHTML = products.map(p => `
+                    <div class="item" style="background:white; padding:15px; border:1px solid #ddd; border-radius:10px; text-align:center;">
+                        <img src="${p.product_photo}" style="width:100%; height:150px; object-fit:contain;">
+                        <h4 style="font-size:14px;">${p.product_title.substring(0, 40)}...</h4>
+                        <p style="color:green; font-weight:bold;">${p.product_price || 'Cek Harga'}</p>
+                        <a href="${p.product_url}" target="_blank" style="font-size:12px;">Lihat Produk</a>
+                    </div>
+                `).join('');
+            } catch (err) { container.innerHTML = "Gagal memuat data."; }
+        }
+    </script>
+</body>
+</html>
