@@ -1,0 +1,58 @@
+@startuml
+' Optimasi Tampilan Pro
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam linetype ortho
+skinparam nodesep 80
+skinparam ranksep 60
+
+' Pengaturan Arah
+top to bottom direction
+
+package "Presentation Tier (Frontend)" as Client {
+    [Web Browser Interface] as ui
+    note bottom of ui
+        - HTML5/CSS3 (UI Layout)
+        - Vanilla JS (State Management)
+        - Fetch API (Async Requests)
+    end note
+}
+
+package "Application Tier (Business Logic)" as Server {
+    [Express.js Server] as express
+    
+    package "API Controllers" {
+        [Auth Controller] as c_auth
+        [Key Controller] as c_key
+        [Product Controller] as c_prod
+    }
+    
+    package "Security & Middleware" {
+        [Express Session] as sess
+        [Key Guard Validator] as guard
+    }
+}
+
+database "Data Tier (Persistence)" as Data {
+    [MySQL Database] as mysql
+    folder "Schema: sport_shop" {
+        [Table: users]
+        [Table: user_keys]
+    }
+}
+
+' Relasi Antar Lapisan
+ui <--> express : HTTP Request/Response (JSON)
+
+express --> c_auth
+express --> c_key
+express --> c_prod
+
+c_auth ..> sess : Management
+c_prod ..> guard : Access Control
+
+c_auth --> mysql : Query Credentials
+c_key --> mysql : CRUD API Keys
+c_prod --> mysql : Read Products
+
+@endum
