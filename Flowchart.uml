@@ -1,0 +1,36 @@
+@startuml
+skinparam conditionStyle diamond
+skinparam roundcorner 15
+skinparam thickness 2
+skinparam shadowing false
+
+title Flowchart Sistem Pencarian Produk - SportShop
+
+start
+
+:User Input Kata Kunci Produk\ndan x-api-key;
+:Frontend kirim Request (POST/GET)\nke API Endpoint;
+
+if (Apakah x-api-key tersedia?) then (Tidak)
+  #pink:Return 401 Unauthorized\n(Key Missing);
+  stop
+else (Ya)
+  :Backend cek validitas Key\ndi Database (Table: user_keys);
+  
+  if (Key Valid & is_active = 1?) then (Tidak)
+    #pink:Return 403 Forbidden\n(Invalid/Expired Key);
+    stop
+  else (Ya)
+    :Sistem memproses pencarian\nke Amazon Product Simulator;
+    
+    if (Produk ditemukan?) then (Ya)
+      :Ambil Data Produk\n(Nama, Harga, Gambar);
+      #lightgreen:Return Response JSON (200 OK);
+    else (Tidak)
+      #lightgray:Return Response JSON (200 OK)\nMessage: "Product Not Found";
+    endif
+  endif
+endif
+
+stop
+@endum
