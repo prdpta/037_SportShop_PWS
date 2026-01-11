@@ -1,0 +1,47 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor "User" as user
+actor "Admin" as admin
+
+rectangle "SportShop System" {
+    ' Fitur User
+    usecase "Registrasi & Login" as UC1
+    usecase "Melihat Status API Key" as UC2
+    usecase "Generate New API Key" as UC3
+    usecase "Pencarian Produk Amazon" as UC4
+    
+    ' Fitur Admin
+    usecase "Monitoring Seluruh User" as UC5
+    usecase "Monitoring Seluruh API Key" as UC6
+    usecase "Logout" as UC7
+}
+
+' Relasi User
+user --> UC1
+user --> UC2
+user --> UC3
+user --> UC4
+user --> UC7
+
+' Relasi Admin (Inheritance dari User + Fitur Khusus)
+admin --> UC1
+admin --> UC2
+admin --> UC3
+admin --> UC4
+admin --> UC5
+admin --> UC6
+admin --> UC7
+
+note right of UC3
+  Menonaktifkan key lama
+  dan membuat SPORT-XXXX
+end note
+
+note right of UC4
+  Memvalidasi API Key
+  sebelum menampilkan data
+end note
+
+@endum
