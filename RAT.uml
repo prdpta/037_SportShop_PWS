@@ -1,0 +1,38 @@
+@startuml
+' Konfigurasi tampilan tabel database yang bersih
+hide circle
+skinparam linetype ortho
+skinparam shadowing false
+skinparam roundcorner 5
+skinparam class {
+    BackgroundColor White
+    ArrowColor Black
+    BorderColor Black
+    HeaderBackgroundColor #DDDDDD
+}
+
+title Relasi Antar Tabel (RAT) - SportShop Database
+
+class "users (Table)" as users << (T,#FFAAAA) >> {
+  + **id** : INT [PK] [AI] [NOT NULL]
+  --
+  * username : VARCHAR(50) [UNIQUE] [NOT NULL]
+  * email : VARCHAR(100) [UNIQUE] [NOT NULL]
+  * password_hash : VARCHAR(255) [NOT NULL]
+  * role : ENUM('admin', 'user') [DEFAULT 'user']
+  * created_at : TIMESTAMP [DEFAULT CURRENT_TIMESTAMP]
+}
+
+class "user_keys (Table)" as keys << (T,#FFAAAA) >> {
+  + **id** : INT [PK] [AI] [NOT NULL]
+  --
+  # **user_id** : INT [FK] [NOT NULL]
+  * key_value : VARCHAR(255) [NOT NULL]
+  * hits : INT [DEFAULT 0]
+  * is_active : TINYINT(1) [DEFAULT 1]
+  * created_at : TIMESTAMP [DEFAULT CURRENT_TIMESTAMP]
+}
+
+' Relasi antar tabel
+users "1" -- "0..*" keys : Foreign Key (user_id)
+@endum
